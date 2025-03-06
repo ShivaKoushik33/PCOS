@@ -18,7 +18,7 @@ function Quiz() {
   const handleSubmit = async () => {
     try {
       console.log(answers);
-      const response = await fetch('http://localhost:5000/predict', {
+      const response = await fetch('https://pcos-backend.onrender.com/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ function Quiz() {
         </div>
 
         {/* Interactive Engagement (For Break) */}
-        {currentPage === Math.floor(questions.length / 2) && (
+        {currentPage === Math.floor(questions.length / 10) && (
           <div className="bg-white p-6 rounded-lg shadow-xl text-center mb-8">
             <h3 className="text-xl font-semibold mb-4">Fun Fact!</h3>
             <p className="text-sm text-gray-600">

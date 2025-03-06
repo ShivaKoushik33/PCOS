@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
+import { Home, Book, ExternalLink } from 'lucide-react';
 
 const Results = () => {
   const location = useLocation();
@@ -16,6 +20,7 @@ const Results = () => {
         prediction: result.prediction,
         noPcosProbability: result.probabilities[0] * 100,
         pcosProbability: result.probabilities[1] * 100,
+        
       });
       setLoading(false);
     }
@@ -43,7 +48,7 @@ const Results = () => {
         <div className="space-y-8">
           <div className="bg-white rounded-xl p-6 shadow-xl mb-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Prediction</h2>
-            <p className="text-xl text-gray-700">{pcosData.prediction}</p>
+            <p className="text-xl text-gray-700">{pcosData.prediction?"You have PCOS":"You do not have PCOS"}</p>
           </div>
 
           {/* Progress Bars for the Probability of PCOS */}
@@ -51,56 +56,144 @@ const Results = () => {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Probability of PCOS Outcome
             </h2>
+            <div className="flex flex-col md:flex-row justify-center items-center gap-12">
+              {/* No PCOS Probability */}
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-4 text-green-600">No PCOS Probability</h3>
+                <div style={{ width: 200, height: 200 }}>
+                  <CircularProgressbar
+                    value={pcosData.noPcosProbability}
+                    text={`${Math.round(pcosData.noPcosProbability)}%`}
+                    styles={{
+                      path: {
+                        stroke: '#28a745', // green-600
+                        strokeLinecap: 'round',
+                        transition: 'stroke-dashoffset 0.5s ease 0s'
+                      },
+                      trail: {
+                        stroke: '#e5e7eb' // gray-200
+                      },
+                      text: {
+                        fill: '#22c55e',
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                      }
+                    }}
+                  />
+                </div>
+              </div>
 
-            {/* Not Having PCOS */}
-            <div className="text-gray-700 mb-4">
-              <p>Not Having PCOS: <span className="font-semibold">{pcosData.noPcosProbability}%</span></p>
-              <motion.div
-                className="h-3 bg-green-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${pcosData.noPcosProbability}%` }}
-                transition={{ duration: 2 }}
-              />
+              {/* PCOS Probability */}
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-4 text-red-600">PCOS Probability</h3>
+                <div style={{ width: 200, height: 200 }}>
+                  <CircularProgressbar
+                    value={pcosData.pcosProbability}
+                    text={`${Math.round(pcosData.pcosProbability)}%`}
+                    styles={{
+                      path: {
+                        stroke: '#FF2A2A', // red-600
+                        strokeLinecap: 'round',
+                        transition: 'stroke-dashoffset 0.5s ease 0s'
+                      },
+                      trail: {
+                        stroke: '#e5e7eb' // gray-200
+                      },
+                      text: {
+                        fill: '#ef4444',
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                      }
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Having PCOS */}
-            <div className="text-gray-700">
-              <p>Having PCOS: <span className="font-semibold">{pcosData.pcosProbability}%</span></p>
-              <motion.div
-                className="h-3 bg-red-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${pcosData.pcosProbability}%` }}
-                transition={{ duration: 2 }}
-              />
-            </div>
+           
           </div>
 
           {/* Text-based Explanation */}
           <div className="bg-white rounded-xl p-6 shadow-xl mb-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Explanation</h2>
-            <p className="text-xl text-gray-700 text-center">
-              Based on your answers, the likelihood of you having PCOS is calculated based on various factors. You have a <strong>{pcosData.prediction}</strong> with a <strong>{pcosData.pcosProbability}%</strong> chance of having PCOS and a <strong>{pcosData.noPcosProbability}%</strong> chance of not having PCOS.
-            </p>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Explanation & Recommendations</h2>
+            <div className="space-y-4">
+              <p className="text-xl text-gray-700 text-center mb-6">
+                Based on your answers, there is a <strong>{Math.round(pcosData.pcosProbability)}%</strong> chance that you may have PCOS.
+              </p>
+
+              {pcosData.pcosProbability > 50 ? (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-red-600">Important Steps to Take:</h3>
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Schedule an appointment with a gynecologist for a proper diagnosis</li>
+                    <li>Consider getting hormonal blood tests</li>
+                    <li>Request an ultrasound examination</li>
+                    <li>Track your menstrual cycles regularly</li>
+                  </ul>
+                  
+                  <h3 className="text-lg font-semibold text-indigo-600 mt-4">Lifestyle Recommendations:</h3>
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Maintain a balanced, low-glycemic diet</li>
+                    <li>Exercise regularly (at least 30 minutes, 5 times a week)</li>
+                    <li>Manage stress through yoga or meditation</li>
+                    <li>Get adequate sleep (7-8 hours per night)</li>
+                  </ul>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-green-600">Preventive Health Tips:</h3>
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Continue maintaining a healthy lifestyle</li>
+                    <li>Regular exercise and balanced nutrition</li>
+                    <li>Track your menstrual cycles</li>
+                    <li>Have regular health check-ups</li>
+                  </ul>
+                  
+                  <h3 className="text-lg font-semibold text-indigo-600 mt-4">Remember:</h3>
+                  <ul className="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Monitor any changes in your menstrual cycle</li>
+                    <li>Stay aware of your body's signals</li>
+                    <li>Consult a healthcare provider if new symptoms develop</li>
+                    <li>Annual gynecological check-ups are recommended</li>
+                  </ul>
+                </div>
+              )}
+
+              <p className="text-sm text-gray-500 mt-6 italic text-center">
+                Note: This assessment is for informational purposes only and should not be considered as a medical diagnosis.
+                Always consult with healthcare professionals for proper medical advice.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Call to Action Button - Navigate to Home */}
-        <motion.button
-          className="bg-red-500 text-black py-3 px-6 rounded-full hover:bg-red-700 transition duration-300"
-          onClick={() => navigate('/')}
-          whileHover={{ scale: 1.1 }}
-        >
-          Go Home
-        </motion.button>
+        {/* Updated Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+          <motion.button
+            className="bg-gradient-to-r from-violet-500 to-violet-600 text-white py-3 px-6 rounded-full 
+                      hover:from-violet-600 hover:to-violet-700 transition duration-300 
+                      flex items-center gap-2 shadow-lg"
+            onClick={() => navigate('/')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Home className="w-5 h-5" />
+            <span>Back to Home</span>
+          </motion.button>
 
-        {/* Call to Action Button - Learn More */}
-        <motion.button
-          className="bg-indigo-500 text-white py-3 px-6 rounded-full hover:bg-indigo-700 transition duration-300 mt-4"
-          onClick={() => alert('Consult a doctor for more advice.')}
-          whileHover={{ scale: 1.1 }}
-        >
-          Learn More
-        </motion.button>
+          <motion.button
+            className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white py-3 px-6 rounded-full 
+                      hover:from-indigo-600 hover:to-indigo-700 transition duration-300 
+                      flex items-center gap-2 shadow-lg"
+            onClick={() => window.open('https://en.wikipedia.org/wiki/Polycystic_ovary_syndromechro', '_blank')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Book className="w-5 h-5" />
+            <span>Learn More</span>
+            <ExternalLink className="w-4 h-4" />
+          </motion.button>
+        </div>
       </motion.div>
     </div>
   );
